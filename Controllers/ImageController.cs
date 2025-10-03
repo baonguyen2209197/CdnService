@@ -15,7 +15,7 @@ namespace CdnService.Controllers
             _imageFolder = options.Value.ImageFolder;
         }
 
-        [HttpGet("{filename}")]
+        [HttpGet("{*filename}")]
         public async Task<IActionResult> GetImage(string filename)
         {
             var filePath = Path.Combine(_imageFolder, filename);
@@ -26,10 +26,10 @@ namespace CdnService.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadImages([FromForm] IFormFileCollection files)
+        public async Task<IActionResult> UploadImages([FromForm] IFormFileCollection files, [FromForm] string? subfolder)
         {
-            const int maxFiles = 20; 
-            const long maxFileSize = 8 * 1024 * 1024; 
+            const int maxFiles = 20;
+            const long maxFileSize = 8 * 1024 * 1024;
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
 
             if (files == null || files.Count == 0)
@@ -38,14 +38,24 @@ namespace CdnService.Controllers
                 return BadRequest($"Chỉ được upload tối đa {maxFiles} file/lượt.");
 
             int successCount = 0;
+
+            // Determine target folder
+            string targetFolder = string.IsNullOrWhiteSpace(subfolder)
+                ? _imageFolder
+                : Path.Combine(_imageFolder, subfolder);
+
+            // Create folder if it does not exist
+            if (!Directory.Exists(targetFolder))
+                Directory.CreateDirectory(targetFolder);
+
             foreach (var file in files)
             {
                 var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
                 if (!allowedExtensions.Contains(ext))
                     continue;
                 if (file.Length > maxFileSize)
-                    continue; 
-                var filePath = Path.Combine(_imageFolder, Path.GetFileName(file.FileName));
+                    continue;
+                var filePath = Path.Combine(targetFolder, Path.GetFileName(file.FileName));
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await file.CopyToAsync(stream);
                 successCount++;
