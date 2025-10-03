@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 namespace CdnService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/image")]
     public class ImageController : ControllerBase
     {
         private readonly string _imageFolder;
