@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -9,13 +10,16 @@ namespace CdnService.Controllers
     {
         private readonly string _imageFolder;
 
-        public ImageController(IOptions<ImageFolderOptions> options)
+        public ImageController(IOptions<FolderOptions> options)
         {
             var folder = options.Value.ImageFolder;
             _imageFolder = options.Value.ImageFolder;
         }
 
+        [AllowAnonymous]
         [HttpGet("{*filename}")]
+        [HttpHead("{*filename}")]
+        [HttpOptions("{*filename}")]
         public async Task<IActionResult> GetImage(string filename)
         {
             var filePath = Path.Combine(_imageFolder, filename);
@@ -25,8 +29,9 @@ namespace CdnService.Controllers
             return PhysicalFile(filePath, contentType);
         }
 
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadImages([FromForm] IFormFileCollection files, [FromForm] string? subfolder)
+    [HttpPost("upload")]
+    [RequestSizeLimit(200 * 1024 * 1024)] // 200MB
+    public async Task<IActionResult> UploadImages([FromForm] IFormFileCollection files, [FromForm] string? subfolder)
         {
             const int maxFiles = 20;
             const long maxFileSize = 8 * 1024 * 1024;

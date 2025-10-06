@@ -2,7 +2,7 @@ using CdnService;
 
 var builder = WebApplication.CreateBuilder(args);
 // Đăng ký cấu hình ImageFolderOptions
-builder.Services.Configure<ImageFolderOptions>(builder.Configuration);
+builder.Services.Configure<FolderOptions>(builder.Configuration);
 
 // Add services to the container.
 
