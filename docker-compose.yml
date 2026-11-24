@@ -8,8 +8,9 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       # ghi đè đường dẫn trong appsettings (đồng bộ với volume bên dưới)
       - ImageFolder=/DataWeb/Images
-      - FileFolder=/DataWeb/Images
+      - FileFolder=/DataWeb/DataSystem
     volumes:
       # ./DataWeb/Images trên máy host  <->  /DataWeb/Images trong container
-      - ./DataWeb/Images:/DataWeb/Images
+      - /srv/volumes/DataWeb/Images:/DataWeb/Images
+      - /srv/volumes/DataSystem:/DataWeb/DataSystem
     restart: unless-stopped
