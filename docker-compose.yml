@@ -1,0 +1,15 @@
+services:
+  cdnservice:
+    build: .
+    container_name: cdnservice
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # ghi đè đường dẫn trong appsettings (đồng bộ với volume bên dưới)
+      - ImageFolder=/DataWeb/Images
+      - FileFolder=/DataWeb/Images
+    volumes:
+      # ./DataWeb/Images trên máy host  <->  /DataWeb/Images trong container
+      - ./DataWeb/Images:/DataWeb/Images
+    restart: unless-stopped
